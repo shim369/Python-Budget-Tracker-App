@@ -40,12 +40,41 @@
 
 ## 2. 要件 → 実装 → テスト(工程2〜4で記入)
 
+> 実装ファイルの列は工程2で記入済み。テストと結果の列は工程3・4で記入する。
+> パスの省略:`a/` = `app/`、`s/` = `static/js/`。
+
 | 要件ID | 実装ファイル | 単体テスト(UT) | 結合テスト(IT:自動) | 手動確認(MT) | 結果 |
 |---|---|---|---|---|---|
-| REQ-001 | (工程2) | (工程3) | (工程4) | (工程4) | |
-| … | | | | | |
-
-> 工程2の完了時に「実装ファイル」の列を、工程3・4の完了時にテストと結果の列を、全要件分記入する。
+| REQ-001 | a/routers/expenses.py, a/services/expense_service.py, a/schemas/expense.py, a/schemas/common.py, s/pages/expenses.js | | | | |
+| REQ-002 | a/routers/expenses.py, a/services/expense_service.py, s/pages/expenses.js | | | | |
+| REQ-003 | a/routers/expenses.py, a/services/expense_service.py, s/pages/expenses.js | | | | |
+| REQ-004 | a/services/expense_service.py, a/domain/period.py, s/pages/expenses.js | | | | |
+| REQ-005 | a/routers/categories.py, a/services/category_service.py, a/domain/categories.py, static/i18n/*.json | | | | |
+| REQ-006 | a/services/category_service.py, a/domain/categories.py(is_name_taken), s/pages/budgets.js | | | | |
+| REQ-007 | a/services/category_service.py(delete), s/pages/budgets.js | | | | |
+| REQ-008 | a/routers/subscriptions.py, a/services/subscription_service.py, a/domain/renewal.py(anchors_for, anchors_after_edit), s/pages/subscriptions.js | | | | |
+| REQ-009 | a/services/subscription_service.py(pause, resume), a/domain/renewal.py(roll_forward) | | | | |
+| REQ-010 | a/services/subscription_service.py(renew), a/domain/renewal.py(advance, can_renew) | | | | |
+| REQ-011 | a/services/subscription_service.py(upcoming), a/domain/renewal.py(select_upcoming), s/pages/dashboard.js | | | | |
+| REQ-012 | a/services/summary_service.py, a/domain/summary.py(month_total, summarize_categories) | | | | |
+| REQ-013 | a/domain/summary.py(change_rate), s/i18n/format.js(formatRate, formatSignedMoney) | | | | |
+| REQ-014 | a/domain/money.py(monthly_equivalent), a/services/summary_service.py | | | | |
+| REQ-015 | a/domain/summary.py(breakdown, trend), a/routers/summary.py, s/charts/chart-config.js, s/charts/chart-render.js | | | | |
+| REQ-016 | a/routers/budgets.py, a/services/budget_service.py, a/schemas/budget.py, s/pages/budgets.js | | | | |
+| REQ-017 | a/domain/budget_rule.py, a/domain/summary.py(build_alerts), s/pages/dashboard.js | | | | |
+| REQ-018 | a/routers/imports.py, a/services/import_service.py, a/domain/csv_rules.py(decode, parse_header), s/pages/csv-import.js | | | | |
+| REQ-019 | a/domain/csv_rules.py(validate_row, duplicate_key), a/services/import_service.py | | | | |
+| REQ-020 | s/i18n/i18n.js, s/main.js($store.i18n), static/index.html | | | | |
+| REQ-021 | s/i18n/format.js, s/charts/chart-config.js | | | | |
+| REQ-022 | a/errors.py, s/api/client.js, s/pages/shared.js, s/main.js($errMsg, $fieldMsg) | | | | |
+| REQ-023 | static/i18n/en.json, static/i18n/ja.json, s/i18n/i18n.js(collectKeys) | | | | |
+| NFR-001 | a/services/summary_service.py, a/repositories/json_store.py | | | | |
+| NFR-002 | a/errors.py, a/schemas/common.py, a/main.py(_remove_default_422_from_openapi) | | | | |
+| NFR-003 | a/repositories/json_store.py(initialize, _move_aside), a/routers/status.py | | | | |
+| NFR-004 | static/vendor/*, static/index.html | | | | |
+| NFR-005 | a/repositories/json_store.py(transaction, _write) | | | | |
+| NFR-006 | a/schemas/common.py(Amount), a/domain/money.py, a/domain/summary.py(Decimal) | | | | |
+| NFR-007 | a/domain/*(純粋関数), s/pages/*(計算なし) | | | | |
 
 ## 3. 設計 → 要件の逆引き(設計の過不足チェック)
 
