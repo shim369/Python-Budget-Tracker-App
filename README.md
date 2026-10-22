@@ -6,6 +6,11 @@ A lightweight, offline **budget & subscription tracker** built with FastAPI.
 Track expenses, see where the money goes each month, catch upcoming subscription renewals, and get warned before you go over budget.
 The UI is English by default and switches to Japanese with one click.
 
+<p align="center">
+  <img src="docs/images/dashboard-en.png" alt="Dashboard in English: monthly total, budget alerts, upcoming renewals and charts" width="49%">
+  <img src="docs/images/dashboard-ja.png" alt="Dashboard in Japanese" width="49%">
+</p>
+
 This repository is a portfolio project for practicing the **detailed design → implementation → unit test → integration test** process.
 Every step has its own documents, and requirements are traced through design, code and tests ([traceability matrix](docs/09_traceability.md)).
 
