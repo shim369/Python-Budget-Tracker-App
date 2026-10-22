@@ -75,19 +75,46 @@ progress.status-over {
   gap: 1rem;
 }
 
+/* Header: wrap whole items, never single characters (BUG-002) */
+header nav {
+  flex-wrap: wrap;
+}
+header nav ul {
+  flex-wrap: wrap;
+}
+header nav a,
+header nav strong,
+.lang-switch button,
+.banner button {
+  white-space: nowrap;
+}
+
 /* Tables */
+th,
+td.nowrap {
+  white-space: nowrap;
+}
 th.num,
 td.num {
   text-align: right;
   white-space: nowrap;
 }
-td.actions {
-  white-space: nowrap;
+/* Action buttons wrap as whole buttons instead of overflowing the table (BUG-002) */
+td.actions .action-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  min-width: 9rem;
 }
 td.actions button {
   padding: 0.25rem 0.5rem;
-  margin: 0 0.25rem 0 0;
+  margin: 0;
   font-size: 0.85rem;
+  white-space: nowrap;
+}
+.badge {
+  display: block;
+  white-space: nowrap;
 }
 tr.muted td {
   opacity: 0.6;

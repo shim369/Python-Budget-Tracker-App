@@ -194,7 +194,7 @@
                       <tbody>
                         <template x-for="line in summary.categories" :key="line.category_id">
                           <tr>
-                            <td x-text="label(line)"></td>
+                            <td class="nowrap" x-text="label(line)"></td>
                             <td class="num" x-text="$fmt.money(line.total)"></td>
                             <td class="num" x-text="$fmt.money(line.previous_total)"></td>
                             <td class="num" x-text="$fmt.signedMoney(line.change_amount) + ' (' + $fmt.rate(line.change_rate) + ')'"></td>
@@ -254,13 +254,15 @@
                     <tbody>
                       <template x-for="item in list.items" :key="item.id">
                         <tr>
-                          <td x-text="$fmt.date(item.date)"></td>
-                          <td x-text="categoryName(item.category_id)"></td>
+                          <td class="nowrap" x-text="$fmt.date(item.date)"></td>
+                          <td class="nowrap" x-text="categoryName(item.category_id)"></td>
                           <td class="num" x-text="$fmt.money(item.amount)"></td>
                           <td x-text="item.memo"></td>
                           <td class="actions">
-                            <button type="button" class="secondary outline" @click="openEdit(item)" x-text="$t('common.edit')"></button>
-                            <button type="button" class="contrast outline" @click="deleteTarget = item" x-text="$t('common.delete')"></button>
+                            <div class="action-group">
+                              <button type="button" class="secondary outline" @click="openEdit(item)" x-text="$t('common.edit')"></button>
+                              <button type="button" class="contrast outline" @click="deleteTarget = item" x-text="$t('common.delete')"></button>
+                            </div>
                           </td>
                         </tr>
                       </template>
@@ -360,19 +362,21 @@
                     <tr :class="item.status === 'paused' ? 'muted' : ''">
                       <td x-text="item.name"></td>
                       <td class="num" x-text="$fmt.money(item.amount)"></td>
-                      <td x-text="$t('cycle.' + item.cycle)"></td>
+                      <td class="nowrap" x-text="$t('cycle.' + item.cycle)"></td>
                       <td class="num" x-text="$fmt.money(item.monthly_equivalent)"></td>
-                      <td>
+                      <td class="nowrap">
                         <span x-text="$fmt.date(item.next_renewal_date)"></span>
-                        <mark x-show="upcomingById[item.id]" :class="upcomingById[item.id]?.is_overdue ? 'status-over' : ''" x-text="badgeText(item.id)"></mark>
+                        <small class="badge" x-show="upcomingById[item.id]" :class="upcomingById[item.id]?.is_overdue ? 'status-over' : 'status-caution'" x-text="badgeText(item.id)"></small>
                       </td>
-                      <td x-text="$t('sub_status.' + item.status)"></td>
+                      <td class="nowrap" x-text="$t('sub_status.' + item.status)"></td>
                       <td class="actions">
-                        <button type="button" class="secondary outline" @click="openEdit(item)" x-text="$t('common.edit')"></button>
-                        <button type="button" class="outline" :disabled="item.status !== 'active'" @click="confirmTarget = { kind: 'renew', item }" x-text="$t('subscriptions.renew')"></button>
-                        <button type="button" class="secondary outline" x-show="item.status === 'active'" @click="setActive(item, false)" x-text="$t('subscriptions.pause')"></button>
-                        <button type="button" class="secondary outline" x-show="item.status === 'paused'" @click="setActive(item, true)" x-text="$t('subscriptions.resume')"></button>
-                        <button type="button" class="contrast outline" @click="confirmTarget = { kind: 'delete', item }" x-text="$t('common.delete')"></button>
+                        <div class="action-group">
+                          <button type="button" class="secondary outline" @click="openEdit(item)" x-text="$t('common.edit')"></button>
+                          <button type="button" class="outline" :disabled="item.status !== 'active'" @click="confirmTarget = { kind: 'renew', item }" x-text="$t('subscriptions.renew')"></button>
+                          <button type="button" class="secondary outline" x-show="item.status === 'active'" @click="setActive(item, false)" x-text="$t('subscriptions.pause')"></button>
+                          <button type="button" class="secondary outline" x-show="item.status === 'paused'" @click="setActive(item, true)" x-text="$t('subscriptions.resume')"></button>
+                          <button type="button" class="contrast outline" @click="confirmTarget = { kind: 'delete', item }" x-text="$t('common.delete')"></button>
+                        </div>
                       </td>
                     </tr>
                   </template>
