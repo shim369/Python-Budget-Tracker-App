@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -49,6 +49,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return FileResponse(index_file)
 
     app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
+
+    @app.middleware("http")
+    async def revalidate_ui_files(request: Request, call_next):
+        """BUG-003: make browsers revalidate the page and static files on every load.
+
+        Without Cache-Control, browsers cache them heuristically, so after an update
+        an old CSS/JS file could be combined with the new HTML. ETag keeps reloads cheap (304).
+        """
+        response = await call_next(request)
+        if request.url.path == "/" or request.url.path.startswith("/static/"):
+            response.headers.setdefault("Cache-Control", "no-cache")
+        return response
+
     _remove_default_422_from_openapi(app)
     return app
 
