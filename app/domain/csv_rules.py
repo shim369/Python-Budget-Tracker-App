@@ -21,6 +21,7 @@ MEMO_MAX = 100
 VALUE_PREVIEW_MAX = 50
 
 _UTF8_BOM = b"\xef\xbb\xbf"
+_UTF16_32_BOMS = (b"\xff\xfe", b"\xfe\xff")  # also covers the UTF-32 LE BOM (FF FE 00 00)
 # Same separator on both sides: 2026-10-01 or 2026/10/1 (not 2026-10/01).
 _DATE_RE = re.compile(r"^(\d{4})([-/])(\d{1,2})\2(\d{1,2})$")
 
@@ -32,7 +33,14 @@ class Decoded:
 
 
 def decode(raw: bytes) -> Decoded | None:
-    """[CSV-02] BOM -> UTF-8 -> cp932 (reported as shift_jis). None if none fits."""
+    """[CSV-02] BOM -> UTF-8 -> cp932 (reported as shift_jis). None if none fits.
+
+    UTF-16/32 is rejected up front (BUG-001): its ASCII characters are paired with
+    NUL bytes, which are also valid UTF-8 / cp932, so trial decoding alone accepts it.
+    Valid UTF-8 or Shift_JIS text never contains NUL bytes.
+    """
+    if raw.startswith(_UTF16_32_BOMS) or b"\x00" in raw:
+        return None
     if raw.startswith(_UTF8_BOM):
         try:
             return Decoded(raw[len(_UTF8_BOM) :].decode("utf-8"), "utf-8-sig")

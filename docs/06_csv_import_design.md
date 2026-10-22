@@ -51,6 +51,7 @@ date,amount,category,memo
 
 ```
 decode(raw: bytes) -> (text, encoding) | CSV_ENCODING_UNSUPPORTED
+  if raw が FF FE / FE FF で始まる、または NUL(00)を含む:  → CSV_ENCODING_UNSUPPORTED   # UTF-16/32(BUG-001で追加)
   if raw が EF BB BF で始まる:  return raw[3:].decode("utf-8"), "utf-8-sig"    # 失敗したらエラー
   try: return raw.decode("utf-8"), "utf-8"
   try: return raw.decode("cp932"), "shift_jis"
