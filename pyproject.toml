@@ -1,6 +1,6 @@
 [project]
 name = "python-budget-tracker-app"
-version = "0.1.0"
+version = "1.0.0"
 description = "Offline budget & subscription tracker built with FastAPI, Pydantic and Alpine.js, with design docs, traceability and unit/integration tests."
 readme = "README.md"
 license = "MIT"
