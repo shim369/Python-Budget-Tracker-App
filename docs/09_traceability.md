@@ -45,36 +45,36 @@
 
 | 要件ID | 実装ファイル | 単体テスト(UT) | 結合テスト(IT:自動) | 手動確認(MT) | 結果 |
 |---|---|---|---|---|---|
-| REQ-001 | a/routers/expenses.py, a/services/expense_service.py, a/schemas/expense.py, a/schemas/common.py, s/pages/expenses.js | | | | |
-| REQ-002 | a/routers/expenses.py, a/services/expense_service.py, s/pages/expenses.js | | | | |
-| REQ-003 | a/routers/expenses.py, a/services/expense_service.py, s/pages/expenses.js | | | | |
-| REQ-004 | a/services/expense_service.py, a/domain/period.py, s/pages/expenses.js | | | | |
-| REQ-005 | a/routers/categories.py, a/services/category_service.py, a/domain/categories.py, static/i18n/*.json | | | | |
-| REQ-006 | a/services/category_service.py, a/domain/categories.py(is_name_taken), s/pages/budgets.js | | | | |
-| REQ-007 | a/services/category_service.py(delete), s/pages/budgets.js | | | | |
-| REQ-008 | a/routers/subscriptions.py, a/services/subscription_service.py, a/domain/renewal.py(anchors_for, anchors_after_edit), s/pages/subscriptions.js | | | | |
-| REQ-009 | a/services/subscription_service.py(pause, resume), a/domain/renewal.py(roll_forward) | | | | |
-| REQ-010 | a/services/subscription_service.py(renew), a/domain/renewal.py(advance, can_renew) | | | | |
-| REQ-011 | a/services/subscription_service.py(upcoming), a/domain/renewal.py(select_upcoming), s/pages/dashboard.js | | | | |
-| REQ-012 | a/services/summary_service.py, a/domain/summary.py(month_total, summarize_categories) | | | | |
-| REQ-013 | a/domain/summary.py(change_rate), s/i18n/format.js(formatRate, formatSignedMoney) | | | | |
-| REQ-014 | a/domain/money.py(monthly_equivalent), a/services/summary_service.py | | | | |
-| REQ-015 | a/domain/summary.py(breakdown, trend), a/routers/summary.py, s/charts/chart-config.js, s/charts/chart-render.js | | | | |
-| REQ-016 | a/routers/budgets.py, a/services/budget_service.py, a/schemas/budget.py, s/pages/budgets.js | | | | |
-| REQ-017 | a/domain/budget_rule.py, a/domain/summary.py(build_alerts), s/pages/dashboard.js | | | | |
-| REQ-018 | a/routers/imports.py, a/services/import_service.py, a/domain/csv_rules.py(decode, parse_header), s/pages/csv-import.js | | | | |
-| REQ-019 | a/domain/csv_rules.py(validate_row, duplicate_key), a/services/import_service.py | | | | |
-| REQ-020 | s/i18n/i18n.js, s/main.js($store.i18n), static/index.html | | | | |
-| REQ-021 | s/i18n/format.js, s/charts/chart-config.js | | | | |
-| REQ-022 | a/errors.py, s/api/client.js, s/pages/shared.js, s/main.js($errMsg, $fieldMsg) | | | | |
-| REQ-023 | static/i18n/en.json, static/i18n/ja.json, s/i18n/i18n.js(collectKeys) | | | | |
-| NFR-001 | a/services/summary_service.py, a/repositories/json_store.py | | | | |
-| NFR-002 | a/errors.py, a/schemas/common.py, a/main.py(_remove_default_422_from_openapi) | | | | |
-| NFR-003 | a/repositories/json_store.py(initialize, _move_aside), a/routers/status.py | | | | |
-| NFR-004 | static/vendor/*, static/index.html | | | | |
-| NFR-005 | a/repositories/json_store.py(transaction, _write) | | | | |
-| NFR-006 | a/schemas/common.py(Amount), a/domain/money.py, a/domain/summary.py(Decimal) | | | | |
-| NFR-007 | a/domain/*(純粋関数), s/pages/*(計算なし) | | | | |
+| REQ-001 | a/routers/expenses.py, a/services/expense_service.py, a/schemas/expense.py, a/schemas/common.py, s/pages/expenses.js | UT-SCH-01〜09, UT-SVC-03, UT-JSHR-01/04 | | | |
+| REQ-002 | a/routers/expenses.py, a/services/expense_service.py, s/pages/expenses.js | UT-SCH-01〜09 | | | |
+| REQ-003 | a/routers/expenses.py, a/services/expense_service.py, s/pages/expenses.js | (IT で確認) | | | |
+| REQ-004 | a/services/expense_service.py, a/domain/period.py, s/pages/expenses.js | UT-PER-03/04, UT-SVC-04, UT-SUM-12 | | | |
+| REQ-005 | a/routers/categories.py, a/services/category_service.py, a/domain/categories.py, static/i18n/*.json | UT-CAT-01/02, UT-I18N-05 | | | |
+| REQ-006 | a/services/category_service.py, a/domain/categories.py(is_name_taken), s/pages/budgets.js | UT-CAT-03〜05, UT-SCH-11 | | | |
+| REQ-007 | a/services/category_service.py(delete), s/pages/budgets.js | UT-SVC-01/02 | | | |
+| REQ-008 | a/routers/subscriptions.py, a/services/subscription_service.py, a/domain/renewal.py(anchors_for, anchors_after_edit), s/pages/subscriptions.js | UT-RNW-12〜17, UT-SCH-10/11, UT-SVC-05, UT-MNY-01〜05 | | | |
+| REQ-009 | a/services/subscription_service.py(pause, resume), a/domain/renewal.py(roll_forward) | UT-RNW-19/20, UT-SVC-07/08 | | | |
+| REQ-010 | a/services/subscription_service.py(renew), a/domain/renewal.py(advance, can_renew) | UT-RNW-01〜11/18/21, UT-SVC-06/07 | | | |
+| REQ-011 | a/services/subscription_service.py(upcoming), a/domain/renewal.py(select_upcoming), s/pages/dashboard.js | UT-RNW-22〜24 | | | |
+| REQ-012 | a/services/summary_service.py, a/domain/summary.py(month_total, summarize_categories) | UT-SUM-12〜15, UT-PER-01〜09, UT-CLK-01〜04 | | | |
+| REQ-013 | a/domain/summary.py(change_rate), s/i18n/format.js(formatRate, formatSignedMoney) | UT-SUM-01〜10, UT-SVC-14, UT-JFMT-02/06 | | | |
+| REQ-014 | a/domain/money.py(monthly_equivalent), a/services/summary_service.py | UT-MNY-01〜05 | | | |
+| REQ-015 | a/domain/summary.py(breakdown, trend), a/routers/summary.py, s/charts/chart-config.js, s/charts/chart-render.js | UT-SUM-11/18〜23, UT-JCHT-01〜05 | | | |
+| REQ-016 | a/routers/budgets.py, a/services/budget_service.py, a/schemas/budget.py, s/pages/budgets.js | UT-SCH-12, UT-SVC-09 | | | |
+| REQ-017 | a/domain/budget_rule.py, a/domain/summary.py(build_alerts), s/pages/dashboard.js | UT-BGT-01〜10, UT-SUM-14/16/17 | | | |
+| REQ-018 | a/routers/imports.py, a/services/import_service.py, a/domain/csv_rules.py(decode, parse_header), s/pages/csv-import.js | UT-CSV-01〜10, UT-SVC-11〜13b, UT-MNY-06〜09 | | | |
+| REQ-019 | a/domain/csv_rules.py(validate_row, duplicate_key), a/services/import_service.py | UT-CSV-11〜18, UT-SVC-10 | | | |
+| REQ-020 | s/i18n/i18n.js, s/main.js($store.i18n), static/index.html | UT-JI18N-01〜07, UT-JRTE-01/02 | | | |
+| REQ-021 | s/i18n/format.js, s/charts/chart-config.js | UT-JFMT-01〜07, UT-JCHT-04/05, UT-JSHR-03 | | | |
+| REQ-022 | a/errors.py, s/api/client.js, s/pages/shared.js, s/main.js($errMsg, $fieldMsg) | UT-ERR-01〜06, UT-JCLI-01〜06, UT-JSHR-01〜03, UT-I18N-03/04 | | | |
+| REQ-023 | static/i18n/en.json, static/i18n/ja.json, s/i18n/i18n.js(collectKeys) | UT-I18N-01〜06 | | | |
+| NFR-001 | a/services/summary_service.py, a/repositories/json_store.py | (IT で確認) | | | |
+| NFR-002 | a/errors.py, a/schemas/common.py, a/main.py(_remove_default_422_from_openapi) | UT-SCH-01〜14, UT-ERR-01〜06 | | | |
+| NFR-003 | a/repositories/json_store.py(initialize, _move_aside), a/routers/status.py | UT-STO-01〜06/11 | | | |
+| NFR-004 | static/vendor/*, static/index.html | (MT で確認) | | | |
+| NFR-005 | a/repositories/json_store.py(transaction, _write) | UT-STO-07〜09(並行実行は IT) | | | |
+| NFR-006 | a/schemas/common.py(Amount), a/domain/money.py, a/domain/summary.py(Decimal) | UT-SCH-02/14, UT-MNY-01〜09, UT-BGT-10 | | | |
+| NFR-007 | a/domain/*(純粋関数), s/pages/*(計算なし) | UT-* の domain テストが I/O なしで成立していること | | | |
 
 ## 3. 設計 → 要件の逆引き(設計の過不足チェック)
 
