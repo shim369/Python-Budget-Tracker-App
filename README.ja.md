@@ -7,8 +7,7 @@ FastAPI で作った、ローカルで動く軽量な**家計・サブスク管�
 画面は英語が既定で、ボタン1つで日本語に切り替えられます。
 
 <p align="center">
-  <img src="docs/images/dashboard-ja.png" alt="日本語のダッシュボード:月の支出合計、予算アラート、更新予定、グラフ" width="49%">
-  <img src="docs/images/dashboard-en.png" alt="英語のダッシュボード" width="49%">
+  <img src="docs/images/dashboard-ja.png" alt="ダッシュボード:月の支出合計、予算アラート、更新予定、グラフ" width="720">
 </p>
 
 このリポジトリは、**詳細設計 → 実装 → 単体テスト → 結合テスト**の工程を練習するためのポートフォリオです。
