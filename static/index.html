@@ -1,0 +1,598 @@
+<!doctype html>
+<!-- Single page app. Design refs: 02_screen_design.md (SCR-00..05). All text comes from static/i18n/*.json. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Budget Tracker</title>
+    <link rel="stylesheet" href="/static/vendor/pico.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- AD-02: vendored libraries only (no CDN). Order: Chart (classic) -> main.js (module) -> Alpine (defer). -->
+    <script src="/static/vendor/chart.umd.min.js"></script>
+    <script type="module" src="/static/js/main.js"></script>
+    <script defer src="/static/vendor/alpine.min.js"></script>
+  </head>
+  <body>
+    <div x-data x-cloak x-show="$store.i18n.ready">
+      <!-- SCR-00 common layout -->
+      <header class="container">
+        <nav>
+          <ul>
+            <li><strong x-text="$t('app.title')"></strong></li>
+          </ul>
+          <ul>
+            <template x-for="route in ['dashboard', 'expenses', 'subscriptions', 'budgets', 'import']" :key="route">
+              <li>
+                <a
+                  :href="'#/' + route"
+                  x-text="$t('nav.' + route)"
+                  :aria-current="$store.app.route === route ? 'page' : null"
+                ></a>
+              </li>
+            </template>
+          </ul>
+          <ul>
+            <!-- 00-3: these two labels are intentionally not translated -->
+            <li>
+              <div role="group" class="lang-switch" :aria-label="$t('lang.label')">
+                <button
+                  type="button"
+                  class="outline"
+                  :aria-pressed="$store.i18n.lang === 'en' ? 'true' : 'false'"
+                  @click="$store.i18n.setLang('en')"
+                >EN</button>
+                <button
+                  type="button"
+                  class="outline"
+                  :aria-pressed="$store.i18n.lang === 'ja' ? 'true' : 'false'"
+                  @click="$store.i18n.setLang('ja')"
+                >日本語</button>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <main class="container">
+        <!-- 00-4 data recovered banner (ERR-30) -->
+        <template x-if="$store.app.status?.data_recovered && !$store.app.bannerDismissed">
+          <article class="banner status-over" role="alert">
+            <span x-text="$t('banner.data_recovered', { file: $store.app.status.backup_file })"></span>
+            <button type="button" class="secondary outline" @click="$store.app.bannerDismissed = true" x-text="$t('common.close')"></button>
+          </article>
+        </template>
+        <template x-if="$store.app.statusError">
+          <article class="banner status-over" role="alert" x-text="$errMsg($store.app.statusError)"></article>
+        </template>
+
+        <!-- ============================ SCR-01 Dashboard ============================ -->
+        <section x-data="dashboardPage" x-show="$store.app.route === 'dashboard'" @i18n:changed.window="renderCharts()">
+          <div class="page-head">
+            <h2 x-text="$t('dashboard.title')"></h2>
+            <div role="group" class="month-nav">
+              <button type="button" class="secondary outline" :disabled="!summary?.previous_month" @click="load(summary.previous_month)" :aria-label="$t('dashboard.prev_month')">◀</button>
+              <strong x-text="$fmt.month(month)"></strong>
+              <button type="button" class="secondary outline" :disabled="isCurrentMonth || !summary?.next_month" @click="load(summary.next_month)" :aria-label="$t('dashboard.next_month')">▶</button>
+            </div>
+          </div>
+
+          <template x-if="error">
+            <article class="status-over">
+              <p x-text="$errMsg(error)"></p>
+              <button type="button" @click="load()" x-text="$t('common.retry')"></button>
+            </article>
+          </template>
+
+          <div :aria-busy="loading ? 'true' : 'false'">
+            <template x-if="summary">
+              <div>
+                <div class="grid cards">
+                  <article>
+                    <header x-text="$t('dashboard.total')"></header>
+                    <p class="big" x-text="$fmt.money(summary.total)"></p>
+                    <small>
+                      <span x-text="$t('dashboard.change')"></span>:
+                      <span x-text="$fmt.signedMoney(summary.change_amount)"></span>
+                      (<span x-text="$fmt.rate(summary.change_rate)"></span>)
+                      <template x-if="summary.change_rate === null">
+                        <span x-text="$t('dashboard.no_previous')"></span>
+                      </template>
+                    </small>
+                  </article>
+                  <article>
+                    <header x-text="$t('dashboard.overall_budget')"></header>
+                    <template x-if="summary.overall_budget.status === 'none'">
+                      <p>
+                        <span x-text="$t('budget_status.none')"></span> ·
+                        <a href="#/budgets" x-text="$t('dashboard.set_budget')"></a>
+                      </p>
+                    </template>
+                    <template x-if="summary.overall_budget.status !== 'none'">
+                      <div>
+                        <p class="big" :class="'status-' + summary.overall_budget.status">
+                          <span x-text="$fmt.percent(summary.overall_budget.usage_percent)"></span>
+                          <small x-text="$t('budget_status.' + summary.overall_budget.status)"></small>
+                        </p>
+                        <progress :class="'status-' + summary.overall_budget.status" :value="summary.overall_budget.usage_percent" max="100"></progress>
+                        <small x-text="$fmt.money(summary.overall_budget.spent) + ' / ' + $fmt.money(summary.overall_budget.budget)"></small>
+                      </div>
+                    </template>
+                  </article>
+                  <article>
+                    <header x-text="$t('dashboard.subscriptions')"></header>
+                    <p class="big" x-text="$fmt.money(summary.subscriptions.monthly_total)"></p>
+                    <small x-text="$t('dashboard.active_count', { count: summary.subscriptions.active_count })"></small>
+                  </article>
+                </div>
+
+                <!-- 01-6 budget alerts -->
+                <template x-if="summary.alerts.length > 0">
+                  <article>
+                    <header x-text="$t('dashboard.alerts')"></header>
+                    <ul>
+                      <template x-for="alert in summary.alerts" :key="alert.scope + (alert.category_id ?? '')">
+                        <li :class="'status-' + alert.status">
+                          <a href="#/budgets" x-text="alertText(alert)"></a>
+                        </li>
+                      </template>
+                    </ul>
+                  </article>
+                </template>
+
+                <!-- 01-7 upcoming renewals -->
+                <article>
+                  <header x-text="$t('dashboard.upcoming')"></header>
+                  <template x-if="upcoming && upcoming.items.length === 0">
+                    <p x-text="$t('upcoming.none')"></p>
+                  </template>
+                  <ul>
+                    <template x-for="item in upcoming?.items ?? []" :key="item.id">
+                      <li :class="item.is_overdue ? 'status-over' : ''">
+                        <a href="#/subscriptions" x-text="item.name"></a>
+                        — <span x-text="$fmt.money(item.amount)"></span>
+                        — <span x-text="$fmt.date(item.next_renewal_date)"></span>
+                        (<span x-text="upcomingText(item)"></span>)
+                      </li>
+                    </template>
+                  </ul>
+                </article>
+
+                <!-- 01-8 / 01-9 charts (CH-01, CH-02) -->
+                <div class="grid">
+                  <article>
+                    <header x-text="$t('chart.breakdown_title')"></header>
+                    <p x-show="breakdown && breakdown.items.length === 0" x-text="$t('chart.no_data')"></p>
+                    <div class="chart-box" x-show="breakdown && breakdown.items.length > 0">
+                      <canvas x-ref="breakdownCanvas" role="img" :aria-label="$t('chart.breakdown_label')"></canvas>
+                    </div>
+                  </article>
+                  <article>
+                    <header x-text="$t('chart.trend_title')"></header>
+                    <p x-show="trend && trendEmpty" x-text="$t('chart.no_data')"></p>
+                    <div class="chart-box" x-show="trend && !trendEmpty">
+                      <canvas x-ref="trendCanvas" role="img" :aria-label="$t('chart.trend_label')"></canvas>
+                    </div>
+                  </article>
+                </div>
+
+                <!-- 01-10 category table -->
+                <article>
+                  <header x-text="$t('dashboard.categories_table')"></header>
+                  <p x-show="summary.categories.length === 0" x-text="$t('chart.no_data')"></p>
+                  <div class="overflow-auto" x-show="summary.categories.length > 0">
+                    <table class="striped">
+                      <thead>
+                        <tr>
+                          <th x-text="$t('field.category')"></th>
+                          <th class="num" x-text="$t('dashboard.this_month')"></th>
+                          <th class="num" x-text="$t('dashboard.previous')"></th>
+                          <th class="num" x-text="$t('dashboard.change')"></th>
+                          <th class="num" x-text="$t('field.budget')"></th>
+                          <th class="num" x-text="$t('dashboard.usage')"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template x-for="line in summary.categories" :key="line.category_id">
+                          <tr>
+                            <td x-text="label(line)"></td>
+                            <td class="num" x-text="$fmt.money(line.total)"></td>
+                            <td class="num" x-text="$fmt.money(line.previous_total)"></td>
+                            <td class="num" x-text="$fmt.signedMoney(line.change_amount) + ' (' + $fmt.rate(line.change_rate) + ')'"></td>
+                            <td class="num" x-text="line.budget === null ? '—' : $fmt.money(line.budget)"></td>
+                            <td class="num" :class="'status-' + line.status">
+                              <span x-text="$fmt.percent(line.usage_percent)"></span>
+                              <small x-show="line.status !== 'none'" x-text="$t('budget_status.' + line.status)"></small>
+                            </td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                </article>
+              </div>
+            </template>
+          </div>
+        </section>
+
+        <!-- ============================ SCR-02 Expenses ============================ -->
+        <section x-data="expensesPage" x-show="$store.app.route === 'expenses'">
+          <div class="page-head">
+            <h2 x-text="$t('expenses.title')"></h2>
+            <button type="button" @click="openCreate()" x-text="$t('expenses.add')"></button>
+          </div>
+          <label>
+            <span x-text="$t('field.month')"></span>
+            <input type="month" min="2000-01" max="2099-12" x-model="month" @change="load()" />
+          </label>
+
+          <template x-if="error">
+            <article class="status-over">
+              <p x-text="$errMsg(error)"></p>
+              <button type="button" @click="load()" x-text="$t('common.retry')"></button>
+            </article>
+          </template>
+
+          <div :aria-busy="loading ? 'true' : 'false'">
+            <template x-if="list">
+              <div>
+                <p>
+                  <strong x-text="$fmt.money(list.total)"></strong>
+                  <small x-text="$t('expenses.count', { count: list.count })"></small>
+                </p>
+                <p x-show="list.items.length === 0" x-text="$t('expenses.empty')"></p>
+                <div class="overflow-auto" x-show="list.items.length > 0">
+                  <table class="striped">
+                    <thead>
+                      <tr>
+                        <th x-text="$t('field.date')"></th>
+                        <th x-text="$t('field.category')"></th>
+                        <th class="num" x-text="$t('field.amount')"></th>
+                        <th x-text="$t('field.memo')"></th>
+                        <th x-text="$t('common.actions')"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template x-for="item in list.items" :key="item.id">
+                        <tr>
+                          <td x-text="$fmt.date(item.date)"></td>
+                          <td x-text="categoryName(item.category_id)"></td>
+                          <td class="num" x-text="$fmt.money(item.amount)"></td>
+                          <td x-text="item.memo"></td>
+                          <td class="actions">
+                            <button type="button" class="secondary outline" @click="openEdit(item)" x-text="$t('common.edit')"></button>
+                            <button type="button" class="contrast outline" @click="deleteTarget = item" x-text="$t('common.delete')"></button>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- 02-5..02-9 form dialog -->
+          <dialog
+            x-effect="if (dialogOpen && !$el.open) $el.showModal(); if (!dialogOpen && $el.open) $el.close()"
+            @close="dialogOpen = false"
+          >
+            <article>
+              <header><h3 x-text="$t(editingId ? 'expenses.edit' : 'expenses.add')"></h3></header>
+              <form id="expense-form" @submit.prevent="save()" novalidate>
+                <label>
+                  <span x-text="$t('field.date')"></span>
+                  <input type="date" required min="2000-01-01" max="2099-12-31" x-model="form.date" :aria-invalid="fieldErrors.date ? 'true' : null" />
+                  <small x-show="fieldErrors.date" x-text="$fieldMsg(fieldErrors.date)"></small>
+                </label>
+                <label>
+                  <span x-text="$t('field.amount')"></span>
+                  <input type="number" required min="1" max="9999999" step="1" inputmode="numeric" x-model.number="form.amount" :aria-invalid="fieldErrors.amount ? 'true' : null" />
+                  <small x-show="fieldErrors.amount" x-text="$fieldMsg(fieldErrors.amount)"></small>
+                </label>
+                <label>
+                  <span x-text="$t('field.category')"></span>
+                  <select required x-model="form.category_id" :aria-invalid="fieldErrors.category_id ? 'true' : null">
+                    <template x-for="c in categories" :key="c.id">
+                      <option :value="c.id" x-text="categoryName(c.id)" :selected="c.id === form.category_id"></option>
+                    </template>
+                  </select>
+                  <small x-show="fieldErrors.category_id" x-text="$fieldMsg(fieldErrors.category_id)"></small>
+                </label>
+                <label>
+                  <span x-text="$t('field.memo') + ' ' + $t('common.optional')"></span>
+                  <input type="text" maxlength="100" x-model="form.memo" :aria-invalid="fieldErrors.memo ? 'true' : null" />
+                  <small x-show="fieldErrors.memo" x-text="$fieldMsg(fieldErrors.memo)"></small>
+                </label>
+              </form>
+              <footer>
+                <button type="button" class="secondary" @click="dialogOpen = false" x-text="$t('common.cancel')"></button>
+                <button type="submit" form="expense-form" :aria-busy="saving ? 'true' : 'false'" :disabled="saving" x-text="$t('common.save')"></button>
+              </footer>
+            </article>
+          </dialog>
+
+          <!-- 02-10 delete confirmation -->
+          <dialog
+            x-effect="if (deleteTarget && !$el.open) $el.showModal(); if (!deleteTarget && $el.open) $el.close()"
+            @close="deleteTarget = null"
+          >
+            <article>
+              <p x-text="$t('expenses.delete_confirm')"></p>
+              <footer>
+                <button type="button" class="secondary" @click="deleteTarget = null" x-text="$t('common.cancel')"></button>
+                <button type="button" class="contrast" @click="confirmDelete()" x-text="$t('common.delete')"></button>
+              </footer>
+            </article>
+          </dialog>
+        </section>
+
+        <!-- ============================ SCR-03 Subscriptions ============================ -->
+        <section x-data="subscriptionsPage" x-show="$store.app.route === 'subscriptions'">
+          <div class="page-head">
+            <h2 x-text="$t('subscriptions.title')"></h2>
+            <button type="button" @click="openCreate()" x-text="$t('subscriptions.add')"></button>
+          </div>
+
+          <template x-if="error">
+            <article class="status-over">
+              <p x-text="$errMsg(error)"></p>
+              <button type="button" @click="load()" x-text="$t('common.retry')"></button>
+            </article>
+          </template>
+
+          <div :aria-busy="loading ? 'true' : 'false'">
+            <p x-show="!loading && items.length === 0" x-text="$t('subscriptions.empty')"></p>
+            <div class="overflow-auto" x-show="items.length > 0">
+              <table class="striped">
+                <thead>
+                  <tr>
+                    <th x-text="$t('field.name')"></th>
+                    <th class="num" x-text="$t('field.amount')"></th>
+                    <th x-text="$t('field.cycle')"></th>
+                    <th class="num" x-text="$t('subscriptions.monthly_equivalent')"></th>
+                    <th x-text="$t('field.next_renewal_date')"></th>
+                    <th x-text="$t('subscriptions.status')"></th>
+                    <th x-text="$t('common.actions')"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="item in items" :key="item.id">
+                    <tr :class="item.status === 'paused' ? 'muted' : ''">
+                      <td x-text="item.name"></td>
+                      <td class="num" x-text="$fmt.money(item.amount)"></td>
+                      <td x-text="$t('cycle.' + item.cycle)"></td>
+                      <td class="num" x-text="$fmt.money(item.monthly_equivalent)"></td>
+                      <td>
+                        <span x-text="$fmt.date(item.next_renewal_date)"></span>
+                        <mark x-show="upcomingById[item.id]" :class="upcomingById[item.id]?.is_overdue ? 'status-over' : ''" x-text="badgeText(item.id)"></mark>
+                      </td>
+                      <td x-text="$t('sub_status.' + item.status)"></td>
+                      <td class="actions">
+                        <button type="button" class="secondary outline" @click="openEdit(item)" x-text="$t('common.edit')"></button>
+                        <button type="button" class="outline" :disabled="item.status !== 'active'" @click="confirmTarget = { kind: 'renew', item }" x-text="$t('subscriptions.renew')"></button>
+                        <button type="button" class="secondary outline" x-show="item.status === 'active'" @click="setActive(item, false)" x-text="$t('subscriptions.pause')"></button>
+                        <button type="button" class="secondary outline" x-show="item.status === 'paused'" @click="setActive(item, true)" x-text="$t('subscriptions.resume')"></button>
+                        <button type="button" class="contrast outline" @click="confirmTarget = { kind: 'delete', item }" x-text="$t('common.delete')"></button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 03-4..03-7 form dialog -->
+          <dialog
+            x-effect="if (dialogOpen && !$el.open) $el.showModal(); if (!dialogOpen && $el.open) $el.close()"
+            @close="dialogOpen = false"
+          >
+            <article>
+              <header><h3 x-text="$t(editingId ? 'subscriptions.edit' : 'subscriptions.add')"></h3></header>
+              <form id="subscription-form" @submit.prevent="save()" novalidate>
+                <label>
+                  <span x-text="$t('field.name')"></span>
+                  <input type="text" required maxlength="50" x-model="form.name" :aria-invalid="fieldErrors.name ? 'true' : null" />
+                  <small x-show="fieldErrors.name" x-text="$fieldMsg(fieldErrors.name)"></small>
+                </label>
+                <label>
+                  <span x-text="$t('field.amount')"></span>
+                  <input type="number" required min="1" max="9999999" step="1" inputmode="numeric" x-model.number="form.amount" :aria-invalid="fieldErrors.amount ? 'true' : null" />
+                  <small x-show="fieldErrors.amount" x-text="$fieldMsg(fieldErrors.amount)"></small>
+                </label>
+                <label>
+                  <span x-text="$t('field.cycle')"></span>
+                  <select x-model="form.cycle" :aria-invalid="fieldErrors.cycle ? 'true' : null">
+                    <option value="monthly" x-text="$t('cycle.monthly')"></option>
+                    <option value="yearly" x-text="$t('cycle.yearly')"></option>
+                  </select>
+                  <small x-show="fieldErrors.cycle" x-text="$fieldMsg(fieldErrors.cycle)"></small>
+                </label>
+                <label>
+                  <span x-text="$t('field.next_renewal_date')"></span>
+                  <input type="date" required min="2000-01-01" max="2099-12-31" x-model="form.next_renewal_date" :aria-invalid="fieldErrors.next_renewal_date ? 'true' : null" />
+                  <small x-show="fieldErrors.next_renewal_date" x-text="$fieldMsg(fieldErrors.next_renewal_date)"></small>
+                </label>
+              </form>
+              <footer>
+                <button type="button" class="secondary" @click="dialogOpen = false" x-text="$t('common.cancel')"></button>
+                <button type="submit" form="subscription-form" :aria-busy="saving ? 'true' : 'false'" :disabled="saving" x-text="$t('common.save')"></button>
+              </footer>
+            </article>
+          </dialog>
+
+          <!-- 03-8 renew / delete confirmation -->
+          <dialog
+            x-effect="if (confirmTarget && !$el.open) $el.showModal(); if (!confirmTarget && $el.open) $el.close()"
+            @close="confirmTarget = null"
+          >
+            <article>
+              <p x-text="confirmTarget ? $t('subscriptions.' + confirmTarget.kind + '_confirm', { name: confirmTarget.item.name }) : ''"></p>
+              <footer>
+                <button type="button" class="secondary" @click="confirmTarget = null" x-text="$t('common.cancel')"></button>
+                <button type="button" :class="confirmTarget?.kind === 'delete' ? 'contrast' : ''" @click="confirmAction()" x-text="$t('common.confirm')"></button>
+              </footer>
+            </article>
+          </dialog>
+        </section>
+
+        <!-- ============================ SCR-04 Budgets & categories ============================ -->
+        <section x-data="budgetsPage" x-show="$store.app.route === 'budgets'">
+          <h2 x-text="$t('budgets.title')"></h2>
+
+          <template x-if="error">
+            <article class="status-over">
+              <p x-text="$errMsg(error)"></p>
+              <button type="button" @click="load()" x-text="$t('common.retry')"></button>
+            </article>
+          </template>
+
+          <div :aria-busy="loading ? 'true' : 'false'">
+            <form @submit.prevent="saveBudgets()" novalidate>
+              <label>
+                <span x-text="$t('budgets.overall')"></span>
+                <input type="number" min="0" max="99999999" step="1" inputmode="numeric" x-model.number="budgetForm.overall" :placeholder="$t('budgets.unset')" :aria-invalid="fieldErrors.overall ? 'true' : null" />
+                <small x-show="fieldErrors.overall" x-text="$fieldMsg(fieldErrors.overall)"></small>
+                <small x-show="!fieldErrors.overall" x-text="$t('budgets.hint')"></small>
+              </label>
+
+              <h3 x-text="$t('budgets.by_category')"></h3>
+              <div class="overflow-auto">
+                <table class="striped">
+                  <thead>
+                    <tr>
+                      <th x-text="$t('field.category')"></th>
+                      <th x-text="$t('field.budget')"></th>
+                      <th x-text="$t('common.actions')"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="(c, index) in categories" :key="c.id">
+                      <tr>
+                        <td x-text="label(c)"></td>
+                        <td>
+                          <input type="number" min="0" max="99999999" step="1" inputmode="numeric" x-model.number="budgetForm.byCategory[c.id]" :placeholder="$t('budgets.unset')" :aria-invalid="rowError(index) ? 'true' : null" />
+                          <small x-show="rowError(index)" x-text="$fieldMsg(rowError(index))"></small>
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            class="contrast outline"
+                            :disabled="c.is_fixed || c.in_use"
+                            :title="c.is_fixed ? $t('budgets.fixed') : (c.in_use ? $t('budgets.in_use') : '')"
+                            @click="deleteTarget = c"
+                            x-text="$t('common.delete')"
+                          ></button>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+              <button type="submit" :aria-busy="saving ? 'true' : 'false'" :disabled="saving" x-text="$t('budgets.save')"></button>
+            </form>
+
+            <h3 x-text="$t('budgets.add_category')"></h3>
+            <form @submit.prevent="addCategory()" novalidate>
+              <fieldset role="group">
+                <input type="text" required maxlength="30" x-model="newCategoryName" :placeholder="$t('field.name')" :aria-invalid="categoryErrors.name ? 'true' : null" />
+                <button type="submit" x-text="$t('common.add')"></button>
+              </fieldset>
+              <small x-show="categoryErrors.name" x-text="$fieldMsg(categoryErrors.name)"></small>
+            </form>
+          </div>
+
+          <dialog
+            x-effect="if (deleteTarget && !$el.open) $el.showModal(); if (!deleteTarget && $el.open) $el.close()"
+            @close="deleteTarget = null"
+          >
+            <article>
+              <p x-text="deleteTarget ? $t('budgets.delete_confirm', { name: label(deleteTarget) }) : ''"></p>
+              <footer>
+                <button type="button" class="secondary" @click="deleteTarget = null" x-text="$t('common.cancel')"></button>
+                <button type="button" class="contrast" @click="confirmDelete()" x-text="$t('common.delete')"></button>
+              </footer>
+            </article>
+          </dialog>
+        </section>
+
+        <!-- ============================ SCR-05 CSV import ============================ -->
+        <section x-data="csvImportPage" x-show="$store.app.route === 'import'">
+          <h2 x-text="$t('import.title')"></h2>
+
+          <details>
+            <summary x-text="$t('import.format_title')"></summary>
+            <p x-text="$t('import.format_desc')"></p>
+            <pre><code>date,amount,category,memo
+2026-10-01,1200,food,Lunch
+2026/10/02,"3,980",日用品,Detergent</code></pre>
+            <ul>
+              <li x-text="$t('import.rule_columns')"></li>
+              <li x-text="$t('import.rule_date')"></li>
+              <li x-text="$t('import.rule_amount')"></li>
+              <li x-text="$t('import.rule_category')"></li>
+              <li x-text="$t('import.rule_encoding')"></li>
+              <li x-text="$t('import.rule_limits')"></li>
+              <li x-text="$t('import.rule_duplicates')"></li>
+            </ul>
+          </details>
+
+          <form @submit.prevent="upload()">
+            <label>
+              <span x-text="$t('import.file')"></span>
+              <input type="file" accept=".csv,text/csv" @change="pick($event)" />
+            </label>
+            <button type="submit" :disabled="!file || uploading" :aria-busy="uploading ? 'true' : 'false'" x-text="$t(uploading ? 'import.uploading' : 'import.submit')"></button>
+          </form>
+
+          <template x-if="error">
+            <article class="status-over" role="alert" x-text="$errMsg(error)"></article>
+          </template>
+
+          <template x-if="report">
+            <article :class="report.imported_count === 0 ? 'status-caution' : ''">
+              <header x-text="$t('import.result')"></header>
+              <ul>
+                <li x-text="$t('import.encoding', { encoding: report.encoding })"></li>
+                <li x-text="$t('import.total_rows', { count: report.total_rows })"></li>
+                <li x-text="$t('import.imported', { count: report.imported_count })"></li>
+                <li x-text="$t('import.errors', { count: report.error_count })"></li>
+                <li x-text="$t('import.duplicates', { count: report.duplicate_count })"></li>
+              </ul>
+              <p x-show="report.imported_count === 0" x-text="$t('import.none_imported')"></p>
+              <p x-show="report.imported_count > 0"><a href="#/expenses" x-text="$t('import.view_expenses')"></a></p>
+              <div class="overflow-auto" x-show="report.errors.length > 0">
+                <table class="striped">
+                  <thead>
+                    <tr>
+                      <th class="num" x-text="$t('import.line')"></th>
+                      <th x-text="$t('import.column')"></th>
+                      <th x-text="$t('import.reason')"></th>
+                      <th x-text="$t('import.value')"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="row in report.errors" :key="row.line">
+                      <tr>
+                        <td class="num" x-text="row.line"></td>
+                        <td x-text="row.field ? $t('field.' + row.field) : '—'"></td>
+                        <td x-text="$t('csv.row.' + row.code)"></td>
+                        <td x-text="row.value ?? ''"></td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </template>
+        </section>
+      </main>
+
+      <!-- 00-5 toast -->
+      <div class="toast" role="status" aria-live="polite">
+        <template x-if="$store.app.toast">
+          <article :class="'toast-' + $store.app.toast.kind" x-text="$store.app.toastText()"></article>
+        </template>
+      </div>
+    </div>
+  </body>
+</html>

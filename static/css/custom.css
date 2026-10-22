@@ -1,0 +1,113 @@
+/* Minimal overrides on top of Pico CSS (static/vendor/pico.min.css). */
+
+[x-cloak] {
+  display: none !important;
+}
+
+:root {
+  --bt-ok: #2e7d32;
+  --bt-caution: #b26a00;
+  --bt-over: #c62828;
+}
+
+/* Budget status colors (BR-05) */
+.status-ok {
+  color: var(--bt-ok);
+}
+.status-caution {
+  color: var(--bt-caution);
+}
+.status-over {
+  color: var(--bt-over);
+}
+article.status-caution {
+  border-left: 4px solid var(--bt-caution);
+}
+article.status-over {
+  border-left: 4px solid var(--bt-over);
+}
+progress.status-ok {
+  --pico-progress-color: var(--bt-ok);
+}
+progress.status-caution {
+  --pico-progress-color: var(--bt-caution);
+}
+progress.status-over {
+  --pico-progress-color: var(--bt-over);
+}
+
+/* Layout helpers */
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.month-nav {
+  width: auto;
+  align-items: center;
+}
+.month-nav strong {
+  padding: 0 1rem;
+  white-space: nowrap;
+}
+.lang-switch {
+  margin: 0;
+}
+.lang-switch button[aria-pressed='true'] {
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+}
+.cards .big {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+.chart-box {
+  position: relative;
+  height: 280px;
+}
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Tables */
+th.num,
+td.num {
+  text-align: right;
+  white-space: nowrap;
+}
+td.actions {
+  white-space: nowrap;
+}
+td.actions button {
+  padding: 0.25rem 0.5rem;
+  margin: 0 0.25rem 0 0;
+  font-size: 0.85rem;
+}
+tr.muted td {
+  opacity: 0.6;
+}
+
+/* Toast (00-5) */
+.toast {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 100;
+  max-width: 24rem;
+}
+.toast article {
+  margin: 0;
+  padding: 0.75rem 1rem;
+}
+.toast-success {
+  border-left: 4px solid var(--bt-ok);
+}
+.toast-error {
+  border-left: 4px solid var(--bt-over);
+}

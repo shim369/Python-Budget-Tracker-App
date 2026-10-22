@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "sequences": {
+    "expense": 39,
+    "category": 9,
+    "subscription": 5
+  },
+  "categories": [
+    {
+      "id": "cat-000001",
+      "code": "food",
+      "name": null,
+      "is_fixed": true
+    },
+    {
+      "id": "cat-000002",
+      "code": "daily_goods",
+      "name": null,
+      "is_fixed": true
+    },
+    {
+      "id": "cat-000003",
+      "code": "housing",
+      "name": null,
+      "is_fixed": true
+    },
+    {
+      "id": "cat-000004",
+      "code": "utilities",
+      "name": null,
+      "is_fixed": true
+    },
+    {
+      "id": "cat-000005",
+      "code": "transportation",
+      "name": null,
+      "is_fixed": true
+    },
+    {
+      "id": "cat-000006",
+      "code": "communication",
+      "name": null,
+      "is_fixed": true
+    },
+    {
+      "id": "cat-000007",
+      "code": "entertainment",
+      "name": null,
+      "is_fixed": true
+    },
+    {
+      "id": "cat-000008",
+      "code": "other",
+      "name": null,
+      "is_fixed": true
+    },
+    {
+      "id": "cat-000009",
+      "code": null,
+      "name": "Pets",
+      "is_fixed": false
+    }
+  ],
+  "expenses": [
+    {
+      "id": "exp-000001",
+      "date": "2026-05-01",
+      "amount": 85000,
+      "category_id": "cat-000003",
+      "memo": "Rent"
+    },
+    {
+      "id": "exp-000002",
+      "date": "2026-05-08",
+      "amount": 9800,
+      "category_id": "cat-000004",
+      "memo": "Electricity"
+    },
+    {
+      "id": "exp-000003",
+      "date": "2026-05-10",
+      "amount": 6500,
+      "category_id": "cat-000006",
+      "memo": "Mobile"
+    },
+    {
+      "id": "exp-000004",
+      "date": "2026-05-12",
+      "amount": 32000,
+      "category_id": "cat-000001",
+      "memo": "Groceries"
+    },
+    {
+      "id": "exp-000005",
+      "date": "2026-05-20",
+      "amount": 4200,
+      "category_id": "cat-000002",
+      "memo": "Drugstore"
+    },
+    {
+      "id": "exp-000006",
+      "date": "2026-05-25",
+      "amount": 6000,
+      "category_id": "cat-000007",
+      "memo": "Movie"
+    },
+    {
+      "id": "exp-000007",
+      "date": "2026-06-01",
+      "amount": 85000,
+      "category_id": "cat-000003",
+      "memo": "Rent"
+    },
+    {
+      "id": "exp-000008",
+      "date": "2026-06-09",
+      "amount": 8700,
+      "category_id": "cat-000004",
+      "memo": "Electricity"
+    },
+    {
+      "id": "exp-000009",
+      "date": "2026-06-10",
+      "amount": 6500,
+      "category_id": "cat-000006",
+      "memo": "Mobile"
+    },
+    {
+      "id": "exp-000010",
+      "date": "2026-06-14",
+      "amount": 35500,
+      "category_id": "cat-000001",
+      "memo": "Groceries"
+    },
+    {
+      "id": "exp-000011",
+      "date": "2026-06-22",
+      "amount": 3100,
+      "category_id": "cat-000005",
+      "memo": "Taxi"
+    },
+    {
+      "id": "exp-000012",
+      "date": "2026-06-28",
+      "amount": 12000,
+      "category_id": "cat-000007",
+      "memo": "Concert"
+    },
+    {
+      "id": "exp-000013",
+      "date": "2026-07-01",
+      "amount": 85000,
+      "category_id": "cat-000003",
+      "memo": "Rent"
+    },
+    {
+      "id": "exp-000014",
+      "date": "2026-07-08",
+      "amount": 12400,
+      "category_id": "cat-000004",
+      "memo": "Electricity"
+    },
+    {
+      "id": "exp-000015",
+      "date": "2026-07-10",
+      "amount": 6500,
+      "category_id": "cat-000006",
+      "memo": "Mobile"
+    },
+    {
+      "id": "exp-000016",
+      "date": "2026-07-15",
+      "amount": 38200,
+      "category_id": "cat-000001",
+      "memo": "Groceries"
+    },
+    {
+      "id": "exp-000017",
+      "date": "2026-07-19",
+      "amount": 5400,
+      "category_id": "cat-000009",
+      "memo": "Pet food"
+    },
+    {
+      "id": "exp-000018",
+      "date": "2026-07-31",
+      "amount": 2500,
+      "category_id": "cat-000002",
+      "memo": "Detergent"
+    },
+    {
+      "id": "exp-000019",
+      "date": "2026-08-01",
+      "amount": 85000,
+      "category_id": "cat-000003",
+      "memo": "Rent"
+    },
+    {
+      "id": "exp-000020",
+      "date": "2026-08-08",
+      "amount": 14100,
+      "category_id": "cat-000004",
+      "memo": "Electricity"
+    },
+    {
+      "id": "exp-000021",
+      "date": "2026-08-10",
+      "amount": 6500,
+      "category_id": "cat-000006",
+      "memo": "Mobile"
+    },
+    {
+      "id": "exp-000022",
+      "date": "2026-08-13",
+      "amount": 41000,
+      "category_id": "cat-000001",
+      "memo": "Groceries"
+    },
+    {
+      "id": "exp-000023",
+      "date": "2026-08-16",
+      "amount": 18000,
+      "category_id": "cat-000005",
+      "memo": "Train (family trip)"
+    },
+    {
+      "id": "exp-000024",
+      "date": "2026-08-17",
+      "amount": 9000,
+      "category_id": "cat-000007",
+      "memo": "Museum"
+    },
+    {
+      "id": "exp-000025",
+      "date": "2026-09-01",
+      "amount": 85000,
+      "category_id": "cat-000003",
+      "memo": "Rent"
+    },
+    {
+      "id": "exp-000026",
+      "date": "2026-09-08",
+      "amount": 10200,
+      "category_id": "cat-000004",
+      "memo": "Electricity"
+    },
+    {
+      "id": "exp-000027",
+      "date": "2026-09-10",
+      "amount": 6500,
+      "category_id": "cat-000006",
+      "memo": "Mobile"
+    },
+    {
+      "id": "exp-000028",
+      "date": "2026-09-12",
+      "amount": 36800,
+      "category_id": "cat-000001",
+      "memo": "Groceries"
+    },
+    {
+      "id": "exp-000029",
+      "date": "2026-09-21",
+      "amount": 5400,
+      "category_id": "cat-000009",
+      "memo": "Pet food"
+    },
+    {
+      "id": "exp-000030",
+      "date": "2026-09-30",
+      "amount": 3000,
+      "category_id": "cat-000008",
+      "memo": "Gift"
+    },
+    {
+      "id": "exp-000031",
+      "date": "2026-10-01",
+      "amount": 85000,
+      "category_id": "cat-000003",
+      "memo": "Rent"
+    },
+    {
+      "id": "exp-000032",
+      "date": "2026-10-03",
+      "amount": 1200,
+      "category_id": "cat-000001",
+      "memo": "Lunch"
+    },
+    {
+      "id": "exp-000033",
+      "date": "2026-10-08",
+      "amount": 9100,
+      "category_id": "cat-000004",
+      "memo": "Electricity"
+    },
+    {
+      "id": "exp-000034",
+      "date": "2026-10-10",
+      "amount": 6500,
+      "category_id": "cat-000006",
+      "memo": "Mobile"
+    },
+    {
+      "id": "exp-000035",
+      "date": "2026-10-12",
+      "amount": 38900,
+      "category_id": "cat-000001",
+      "memo": "Groceries"
+    },
+    {
+      "id": "exp-000036",
+      "date": "2026-10-15",
+      "amount": 8600,
+      "category_id": "cat-000007",
+      "memo": "Books"
+    },
+    {
+      "id": "exp-000037",
+      "date": "2026-10-18",
+      "amount": 2980,
+      "category_id": "cat-000002",
+      "memo": "Detergent"
+    },
+    {
+      "id": "exp-000038",
+      "date": "2026-10-20",
+      "amount": 5400,
+      "category_id": "cat-000009",
+      "memo": "Pet food"
+    },
+    {
+      "id": "exp-000039",
+      "date": "2026-10-22",
+      "amount": 1450,
+      "category_id": "cat-000005",
+      "memo": "Bus"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub-000001",
+      "name": "Video streaming",
+      "amount": 1490,
+      "cycle": "monthly",
+      "next_renewal_date": "2026-10-28",
+      "anchor_day": 28,
+      "anchor_month": null,
+      "status": "active"
+    },
+    {
+      "id": "sub-000002",
+      "name": "Music streaming",
+      "amount": 1080,
+      "cycle": "monthly",
+      "next_renewal_date": "2026-10-25",
+      "anchor_day": 25,
+      "anchor_month": null,
+      "status": "active"
+    },
+    {
+      "id": "sub-000003",
+      "name": "Cloud storage",
+      "amount": 13000,
+      "cycle": "yearly",
+      "next_renewal_date": "2026-10-20",
+      "anchor_day": 20,
+      "anchor_month": 10,
+      "status": "active"
+    },
+    {
+      "id": "sub-000004",
+      "name": "Gym",
+      "amount": 7700,
+      "cycle": "monthly",
+      "next_renewal_date": "2026-10-31",
+      "anchor_day": 31,
+      "anchor_month": null,
+      "status": "active"
+    },
+    {
+      "id": "sub-000005",
+      "name": "News app",
+      "amount": 500,
+      "cycle": "monthly",
+      "next_renewal_date": "2026-09-05",
+      "anchor_day": 5,
+      "anchor_month": null,
+      "status": "paused"
+    }
+  ],
+  "budgets": {
+    "overall": 180000,
+    "categories": {
+      "cat-000001": 40000,
+      "cat-000007": 10000,
+      "cat-000004": 15000
+    }
+  }
+}
