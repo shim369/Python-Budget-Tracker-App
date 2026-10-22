@@ -1,5 +1,7 @@
 # Python-Budget-Tracker-App
 
+**English** | [日本語](README.ja.md)
+
 A lightweight, offline **budget & subscription tracker** built with FastAPI.
 Track expenses, see where the money goes each month, catch upcoming subscription renewals, and get warned before you go over budget.
 The UI is English by default and switches to Japanese with one click.
@@ -53,7 +55,7 @@ Open <http://127.0.0.1:8000/>. The API documentation is at <http://127.0.0.1:800
 - **Run a single process.** File locking is per process, so do not use `--workers` (see [DATA-01](docs/04_data_design.md)).
 - "Today" is the date in **Asia/Tokyo**, whatever the server timezone is.
 - Use another data file with `BUDGET_DATA_FILE=/path/to/file.json`.
-- `data/*.json` is git-ignored, except `data/sample.json`.
+- `data/*.json` (except `data/sample.json`) and `data/*.csv` are git-ignored.
 
 ### If the data file is corrupted
 
