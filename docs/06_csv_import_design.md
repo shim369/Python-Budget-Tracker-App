@@ -81,7 +81,8 @@ decode(raw: bytes) -> (text, encoding) | CSV_ENCODING_UNSUPPORTED
 | 3 | 本文が0バイト | 400 | CSV_EMPTY |
 | 4 | 文字コードを判定できない | 400 | CSV_ENCODING_UNSUPPORTED |
 | 5 | 空白・空行しかない | 400 | CSV_EMPTY |
-| 6 | ヘッダーに必須列がない・未定義の列がある・同じ列名が重複している | 400 | CSV_HEADER_INVALID(details に列名) |
+| 5a | CSVとして解析できない(1つの値が csv.field_size_limit=131,072文字を超えるなど) | 400 | CSV_PARSE_ERROR(params.line に行番号)※工程2で追加 |
+| 6 | ヘッダーに必須列がない・未定義の列がある・同じ列名が重複している | 400 | CSV_HEADER_INVALID(details[].field に列名、details[].code に MISSING_COLUMN / UNKNOWN_COLUMN / DUPLICATE_COLUMN) |
 | 7 | データ行(空行を除く)が0件 | 400 | CSV_EMPTY |
 | 8 | データ行が 5,000 行を超える | 413 | CSV_TOO_MANY_ROWS(params.max=5000) |
 

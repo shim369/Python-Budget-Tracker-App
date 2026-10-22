@@ -32,13 +32,15 @@
 | CATEGORY_NAME_DUPLICATED | 409 | カテゴリ名が重複している | A category with this name already exists. | 同じ名前のカテゴリがあります。 |
 | SUBSCRIPTION_STATE_CONFLICT | 409 | 停止中のものを停止・有効なものを再開しようとした | The subscription is already in that state. | すでにその状態です。 |
 | SUBSCRIPTION_INACTIVE | 409 | 停止中のサブスクを「更新済み」にしようとした | Paused subscriptions cannot be renewed. | 停止中のサブスクは更新できません。 |
-| SUBSCRIPTION_RENEW_TOO_EARLY | 409 | 次回更新日が今日から7日より先 | Renewal is available within 7 days of the date. | 更新日の7日前から操作できます。 |
+| SUBSCRIPTION_RENEW_TOO_EARLY | 409 | 次回更新日が今日から7日より先(params.days=7) | Renewal is available from {days} days before the date. | 更新日の{days}日前から操作できます。 |
+| SUBSCRIPTION_DATE_LIMIT | 409 | 更新済み・再開で計算した次回更新日が 2099-12-31 を超える(工程2で追加) | The next renewal date would be after 2099-12-31. | 次回更新日が2099年12月31日を超えるため更新できません。 |
 | CSV_UNSUPPORTED_MEDIA_TYPE | 415 | Content-Type が text/csv でない | Please upload a CSV file. | CSVファイルを指定してください。 |
 | CSV_TOO_LARGE | 413 | 1MBを超える | The file is too large (max 1 MB). | ファイルが大きすぎます(上限1MB)。 |
 | CSV_TOO_MANY_ROWS | 413 | 5,000行を超える | Too many rows (max {max}). | 行数が多すぎます(上限{max}行)。 |
 | CSV_EMPTY | 400 | 0バイト・空白のみ・ヘッダーのみ | The file has no data. | データがありません。 |
 | CSV_ENCODING_UNSUPPORTED | 400 | UTF-8 / Shift_JIS のどちらでも読めない | Unsupported encoding. Use UTF-8 or Shift_JIS. | 文字コードに対応していません(UTF-8またはShift_JIS)。 |
-| CSV_HEADER_INVALID | 400 | ヘッダーの不足・未定義・重複 | Invalid header row. | ヘッダー行が正しくありません。 |
+| CSV_HEADER_INVALID | 400 | ヘッダーの不足・未定義・重複。details[].field に列名、details[].code に MISSING_COLUMN / UNKNOWN_COLUMN / DUPLICATE_COLUMN | Invalid header row. | ヘッダー行が正しくありません。 |
+| CSV_PARSE_ERROR | 400 | csv モジュールが解析できない(1つの値が csv.field_size_limit を超えるなど)。params.line に行番号(工程2で追加) | The CSV could not be read near line {line}. | {line}行目付近でCSVを読み取れませんでした。 |
 | STORAGE_WRITE_FAILED | 500 | データファイルに書き込めない | Failed to save data. | データの保存に失敗しました。 |
 | INTERNAL_ERROR | 500 | 想定外の例外 | Unexpected error occurred. | 予期しないエラーが発生しました。 |
 | NETWORK_ERROR | (フロントのみ) | fetch 自体が失敗した | Cannot connect to the server. | サーバーに接続できません。 |
@@ -63,6 +65,9 @@
 | INVALID_VALUE | その他 | | Invalid value. |
 
 - CSVの行エラーコードは 06_csv_import_design.md の CSV-07 を参照(翻訳キーは `csv.row.<code>`)。
+- **工程2で追加したコードの理由**
+  - SUBSCRIPTION_DATE_LIMIT:範囲外の日付を保存すると、次回の読み込みで整合性違反(DATA-02)となり、データファイル全体が破損扱いになるため。保存の手前で止める。
+  - CSV_PARSE_ERROR:csv モジュールの例外をそのままにすると 500 になり、NFR-002(不正入力は4xx)を満たせないため。
 - 金額の範囲は OUT_OF_RANGE の params で受け取り、表示時に formatMoney で整形する(例:`¥1〜¥9,999,999`)。
 
 ## ERR-10 業務例外の設計

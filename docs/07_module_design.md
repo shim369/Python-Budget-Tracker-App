@@ -130,7 +130,7 @@ flowchart TD
 | ExpenseIn / ExpenseOut / ExpenseListOut | 支出 | API-05〜09 |
 | SubscriptionIn / SubscriptionOut / SubscriptionListOut | サブスク | API-10〜17 |
 | UpcomingItem / UpcomingListOut | 更新予定 | API-18 |
-| CategoryBudgetItem / BudgetsIn / BudgetsOut | 予算 | API-19, 20 |
+| CategoryBudgetItem / BudgetsIn / CategoryBudgetOut / BudgetsOut | 予算(入力用の CategoryBudgetItem は未設定を null で受け取る。出力用の CategoryBudgetOut は設定済みの値だけを返すので常に int。工程2で追加) | API-19, 20 |
 | BudgetStatusOut / CategorySummaryOut / SubscriptionTotalsOut / AlertOut / MonthlySummaryOut | 月次集計 | API-21 |
 | BreakdownItem / CategoryBreakdownOut | 円グラフ | API-22 |
 | TrendItem / MonthlyTrendOut | 棒グラフ | API-23 |

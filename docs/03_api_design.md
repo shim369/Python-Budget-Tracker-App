@@ -229,6 +229,7 @@ Pydantic のエラー種別(`type`)は、次の対応表で項目エラーコー
 - **API-10** の応答は `{"items": [SubscriptionOut]}`(`SubscriptionListOut`)。
   並び順は status(active が先)→ next_renewal_date の昇順 → id の昇順。
 - **API-15〜17** は本文なしで呼び、変更後の `SubscriptionOut` を返す。409 の条件は DATA-04 と BR-03 を参照。
+  API-16・17 で、計算した次回更新日が 2099-12-31 を超える場合は 409 SUBSCRIPTION_DATE_LIMIT とする。
 - **API-18** GET `/api/subscriptions/upcoming` → `UpcomingListOut`
 
 ```json
@@ -360,5 +361,6 @@ Pydantic のエラー種別(`type`)は、次の対応表で項目エラーコー
 }
 ```
 
-- 検証規則とエラーコードは 06_csv_import_design.md(CSV-04、CSV-07)に定める。
+- 検証規則とエラーコードは 06_csv_import_design.md(CSV-03、CSV-04、CSV-07)に定める。
+  ファイル全体のエラーは CSV_UNSUPPORTED_MEDIA_TYPE / CSV_TOO_LARGE / CSV_EMPTY / CSV_ENCODING_UNSUPPORTED / CSV_PARSE_ERROR / CSV_HEADER_INVALID / CSV_TOO_MANY_ROWS。
 - `total_rows = imported_count + error_count + duplicate_count` が常に成り立つ。
