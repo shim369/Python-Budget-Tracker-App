@@ -140,6 +140,10 @@ Design and test documents are in [`docs/`](docs) (written in Japanese).
 
 Code comments and docstrings refer to design IDs (for example `[BR-03]`), so you can jump from code to the rule it implements.
 
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
 ## Third-party libraries and licenses
 
 | Library | Version | License |
