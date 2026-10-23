@@ -36,7 +36,7 @@ flowchart LR
 
 | 区分 | 採用技術 | 備考 |
 |---|---|---|
-| 言語 | Python 3.12 | uv で管理 |
+| 言語 | Python 3.15 | uv で管理 |
 | Web/API | FastAPI / uvicorn | 静的ファイル配信も担当 |
 | 入出力モデル | Pydantic v2 | API設計のJSONスキーマと1対1 |
 | テスト | pytest / pytest-cov / httpx(TestClient) | |

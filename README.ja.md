@@ -31,7 +31,7 @@ FastAPI で作った、ローカルで動く軽量な**家計・サブスク管�
 
 | 区分 | 技術 |
 |---|---|
-| バックエンド | Python 3.12、FastAPI、Pydantic v2、uvicorn |
+| バックエンド | Python 3.15、FastAPI、Pydantic v2、uvicorn |
 | フロントエンド | HTML5、CSS、JavaScript(ES Modules、ビルド工程なし) |
 | UI ライブラリ(同梱、CDN 不使用) | Alpine.js 3.17.4、Chart.js 4.5.1、Pico CSS 2.1.1 |
 | API | REST + JSON。エラーは統一形式 `{"error": {"code", "message", "details"}}` |
@@ -43,7 +43,8 @@ FastAPI で作った、ローカルで動く軽量な**家計・サブスク管�
 
 ## 起動方法
 
-必要なもの:[uv](https://docs.astral.sh/uv/)(Python 3.12 は必要に応じて uv が入れます)。Node.js は JavaScript のテストを実行する場合だけ必要です。
+必要なもの:[uv](https://docs.astral.sh/uv/)(Python 3.15 は必要に応じて uv が入れます)。Node.js は JavaScript のテストを実行する場合だけ必要です。
+uv が Python 3.15.1 を見つけられない場合は、先に `uv self update` で uv を更新してください。
 
 ```bash
 uv sync

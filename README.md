@@ -31,7 +31,7 @@ Every step has its own documents, and requirements are traced through design, co
 
 | Layer | Technology |
 |---|---|
-| Backend | Python 3.12, FastAPI, Pydantic v2, uvicorn |
+| Backend | Python 3.15, FastAPI, Pydantic v2, uvicorn |
 | Frontend | HTML5, CSS, JavaScript (ES modules, no build step) |
 | UI libraries (vendored, no CDN) | Alpine.js 3.17.4, Chart.js 4.5.1, Pico CSS 2.1.1 |
 | API | REST + JSON, unified error format `{"error": {"code", "message", "details"}}` |
@@ -43,7 +43,8 @@ Amounts are always integers (yen). Rates such as month-over-month change are com
 
 ## Getting started
 
-Requirements: [uv](https://docs.astral.sh/uv/) (Python 3.12 is installed by uv if needed). Node.js is only needed to run the JavaScript tests.
+Requirements: [uv](https://docs.astral.sh/uv/) (Python 3.15 is installed by uv if needed). Node.js is only needed to run the JavaScript tests.
+If uv cannot find Python 3.15.1, update uv first with `uv self update`.
 
 ```bash
 uv sync

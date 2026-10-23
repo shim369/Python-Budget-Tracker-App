@@ -4,7 +4,7 @@
 |---|---|
 | 対象 | Budget Tracker(工程2で実装、工程3〜4で不具合を修正したもの) |
 | 期間 | 2026-10-23(工程3 単体テスト、工程4 結合テスト) |
-| 環境 | macOS、Python 3.12.13(uv)、pytest 9.1.1、Node.js 24.7.0、Google Chrome |
+| 環境 | macOS、Python 3.15.1(uv)、pytest 9.1.1、Node.js 24.7.0、Google Chrome |
 | 関連文書 | [ut_spec.md](./ut_spec.md)、[it_spec.md](./it_spec.md)、[it_manual.md](./it_manual.md)、[bug_reports.md](./bug_reports.md)、[09_traceability.md](./09_traceability.md) |
 
 ## 1. 総括

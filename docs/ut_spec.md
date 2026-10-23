@@ -300,7 +300,7 @@
 | JavaScript | `node --test "tests/js/*.test.mjs"` | 32 | 全件成功 |
 
 - Python は parametrize の各ケースを1件として数える。
-- 実行環境:Python 3.12.13、pytest 9.1.1、Node.js 24.7.0、macOS。
+- 実行環境:Python 3.15.1、pytest 9.1.1、Node.js 24.7.0、macOS。
 
 ### 4.2 カバレッジ
 
